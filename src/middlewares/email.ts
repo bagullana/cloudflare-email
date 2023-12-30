@@ -19,6 +19,7 @@ const EmailSchemaMiddleware = async (request: EmailRequest) => {
 
 	return new Response('Bad Request', {
 		status: 400,
+		'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr'
 	});
 };
 

@@ -22,7 +22,7 @@ class Email {
 	static async send(email: IEmail) {
 		// convert email to IMCEmail (MailChannels Email)
 		const mcEmail: IMCEmail = Email.convertEmail(email);
-
+		console.log(mcEmail);
 		// send email through MailChannels
 		const resp = await fetch(
 			new Request('https://api.mailchannels.net/tx/v1/send', {

@@ -10,11 +10,12 @@ const AuthMiddleware = (request: Request, env: Env) => {
 	if (!env.TOKEN || env.TOKEN.length === 0) {
 		return new Response('You must set the TOKEN environment variable.', {
 			status: 401,
+			'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr'
 		});
 	}
 
 	if (token !== env.TOKEN) {
-		return new Response('Unauthorized', { status: 401 });
+		return new Response('Unauthorized', { status: 401, 'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr' });
 	}
 };
 
