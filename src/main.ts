@@ -3,12 +3,7 @@ import Email from './controllers/email';
 import AuthMiddleware from './middlewares/auth';
 import EmailSchemaMiddleware, { EmailRequest } from './middlewares/email';
 import { IEmail } from './schema/email';
-
-const corsHeaders = {
-	'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr',
-	'Access-Control-Allow-Methods': 'GET, OPTIONS, POST',
-	'Access-Control-Allow-Headers': '*'
-};
+import { corsHeaders } from './corsHeaders';
 
 const router = Router();
 

@@ -1,3 +1,5 @@
+import { corsHeaders } from '../corsHeaders';
+
 /**
  * Middleware to check if the user is authenticated
  * @param request
@@ -10,12 +12,12 @@ const AuthMiddleware = (request: Request, env: Env) => {
 	if (!env.TOKEN || env.TOKEN.length === 0) {
 		return new Response('You must set the TOKEN environment variable.', {
 			status: 401,
-			'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr'
+			headers: corsHeaders
 		});
 	}
 
 	if (token !== env.TOKEN) {
-		return new Response('Unauthorized', { status: 401, 'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr' });
+		return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 	}
 };
 

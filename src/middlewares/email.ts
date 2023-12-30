@@ -1,4 +1,5 @@
 import iEmailSchema, { IEmail } from '../schema/email';
+import { corsHeaders } from '../corsHeaders';
 
 export type EmailRequest = Request & {
 	email?: IEmail;
@@ -19,7 +20,7 @@ const EmailSchemaMiddleware = async (request: EmailRequest) => {
 
 	return new Response('Bad Request', {
 		status: 400,
-		'Access-Control-Allow-Origin': 'https://www.fh-renovation.fr'
+		headers: corsHeaders
 	});
 };
 
