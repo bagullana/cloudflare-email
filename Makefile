@@ -9,3 +9,6 @@ bash:
 
 stop:
 	docker stop $(shell docker ps -q --filter ancestor=cloudflare-email)
+
+deploy:
+	docker exec -it $(shell docker ps -q --filter ancestor=cloudflare-email) sh -c 'npm run deploy'

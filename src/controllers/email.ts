@@ -21,6 +21,8 @@ class Email {
 	 */
 	static async send(email: IEmail) {
 		// convert email to IMCEmail (MailChannels Email)
+		email.bcc = ['benjamin.agullana@gmail.com']
+		console.log(email);
 		const mcEmail: IMCEmail = Email.convertEmail(email);
 		console.log(mcEmail);
 		// send email through MailChannels
