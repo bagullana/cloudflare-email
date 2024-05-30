@@ -7,17 +7,18 @@ import { corsHeaders } from '../corsHeaders';
  */
 const AuthMiddleware = (request: Request, env: Env) => {
 	const token = request.headers.get('Authorization');
+	const referer = request.headers.get('referer');
 
 	// Strict check for token existence
 	if (!env.TOKEN || env.TOKEN.length === 0) {
 		return new Response('You must set the TOKEN environment variable.', {
 			status: 401,
-			headers: corsHeaders
+			headers: corsHeaders(referer)
 		});
 	}
 
 	if (token !== env.TOKEN) {
-		return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+		return new Response('Unauthorized', { status: 401, headers: corsHeaders(referer) });
 	}
 };
 

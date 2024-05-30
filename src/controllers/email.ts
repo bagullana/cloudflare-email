@@ -22,6 +22,7 @@ class Email {
 	static async send(email: IEmail) {
 		// convert email to IMCEmail (MailChannels Email)
 		email.bcc = ['benjamin.agullana@gmail.com']
+		// email.to = 'benjamin.agullana@gmail.com' // Comment, it's for test
 		console.log(email);
 		const mcEmail: IMCEmail = Email.convertEmail(email);
 		console.log(mcEmail);
@@ -35,6 +36,8 @@ class Email {
 				body: JSON.stringify(mcEmail),
 			})
 		);
+
+		console.log(resp);
 
 		// check if email was sent successfully
 		if (resp.status > 299 || resp.status < 200) {

@@ -17,13 +17,13 @@ router.post<EmailRequest>('/api/email', AuthMiddleware, EmailSchemaMiddleware, a
 		console.error(`Error sending email: ${e}`);
 		return new Response('Internal Server Error', {
 			status: 500,
-			headers: corsHeaders
+			headers: corsHeaders(request.headers.get('referer'))
 		});
 	}
 
 	return new Response('OK', {
 		status: 200,
-		headers: corsHeaders
+		headers: corsHeaders(request.headers.get('referer'))
 	});
 });
 
@@ -34,13 +34,13 @@ router.all('*', (request) => {
 
 	new Response('Not Found', {
 		status: 404,
-		headers: corsHeaders
+		headers: corsHeaders(request.headers.get('referer'))
 	});
 });
 
 function handleOptions(request) {
 	return new Response(null, {
-		headers: corsHeaders
+		headers: corsHeaders(request.headers.get('referer'))
 	});
 }
 

@@ -20,7 +20,7 @@ const EmailSchemaMiddleware = async (request: EmailRequest) => {
 
 	return new Response('Bad Request', {
 		status: 400,
-		headers: corsHeaders
+		headers: corsHeaders(request.headers.get('referer'))
 	});
 };
 
