@@ -1,140 +1,59 @@
-import { IContact, IEmail } from '../schema/email';
+import { IEmail } from '../schema/email';
+import { Resend } from 'resend';
 
-type IMCPersonalization = { to: IMCContact[] };
-type IMCContact = { email: string; name: string | undefined };
-type IMCContent = { type: string; value: string };
 
-interface IMCEmail {
-	personalizations: IMCPersonalization[];
-	from: IMCContact;
-	reply_to: IMCContact | undefined;
-	cc: IMCContact[] | undefined;
-	bcc: IMCContact[] | undefined;
-	subject: string;
-	content: IMCContent[];
-}
+const formatFrom = (from) => {
+	if (typeof from === 'string') {
+		return from;
+	} else if (typeof from === 'object' && from.name && from.email) {
+		return `${from.name} <${from.email}>`;
+	} else {
+		return 'Invalid from format';
+	}
+};
+
+const getResendApiToken = (from): string => {
+	if (from.includes('elma-lab.tech')) {
+		return 're_2s4T5nFD_39k1AR4uDf8SD4fF9mHRZKBp';
+	} else if (from.includes('fh-renovation.fr')) {
+		return 're_ZF8QTMUW_278RDh2XS3Mhpeedddes2CMP';
+	}
+};
 
 class Email {
+
 	/**
 	 *
 	 * @param email
 	 */
 	static async send(email: IEmail) {
-		// convert email to IMCEmail (MailChannels Email)
-		email.bcc = ['benjamin.agullana@gmail.com']
-		// email.to = 'benjamin.agullana@gmail.com' // Comment, it's for test
-		console.log(email);
-		const mcEmail: IMCEmail = Email.convertEmail(email);
-		console.log(mcEmail);
-		// send email through MailChannels
-		const resp = await fetch(
-			new Request('https://api.mailchannels.net/tx/v1/send', {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json',
-				},
-				body: JSON.stringify(mcEmail),
-			})
-		);
+		// email.to = 'benjamin.agullana@gmail.com'; // Comment, it's for test
+		const from = formatFrom(email.from);
 
-		console.log(resp);
-
-		// check if email was sent successfully
-		if (resp.status > 299 || resp.status < 200) {
-			throw new Error(`Error sending email: ${resp.status} ${resp.statusText}`);
-		}
-	}
-
-	/**
-	 * Converts an IEmail to an IMCEmail
-	 * @param email
-	 * @protected
-	 */
-	protected static convertEmail(email: IEmail): IMCEmail {
-		const personalizations: IMCPersonalization[] = [];
-
-		// Convert 'to' field
-		const toContacts: IMCContact[] = Email.convertContacts(email.to);
-		personalizations.push({ to: toContacts });
-
-		let replyTo: IMCContact | undefined = undefined;
-		let bccContacts: IMCContact[] | undefined = undefined;
-		let ccContacts: IMCContact[] | undefined = undefined;
-
-		// Convert 'replyTo' field
-		if (email.replyTo) {
-			const replyToContacts: IMCContact[] = Email.convertContacts(email.replyTo);
-			replyTo = replyToContacts.length > 0 ? replyToContacts[0] : { email: '', name: undefined };
-		}
-
-		// Convert 'cc' field
-		if (email.cc) {
-			ccContacts = Email.convertContacts(email.cc);
-		}
-
-		// Convert 'bcc' field
-		if (email.bcc) {
-			bccContacts = Email.convertContacts(email.bcc);
-		}
-
-		const from: IMCContact = Email.convertContact(email.from);
-
-		// Convert 'subject' field
-		const subject: string = email.subject;
-
-		// Convert 'text' field
-		const textContent: IMCContent[] = [];
-		if (email.text) {
-			textContent.push({ type: 'text/plain', value: email.text });
-		}
-
-		// Convert 'html' field
-		const htmlContent: IMCContent[] = [];
-		if (email.html) {
-			htmlContent.push({ type: 'text/html', value: email.html });
-		}
-
-		const content: IMCContent[] = [...textContent, ...htmlContent];
-
-		return {
-			personalizations,
-			from,
-			cc: ccContacts,
-			bcc: bccContacts,
-			reply_to: replyTo,
-			subject,
-			content,
+		const resend = new Resend(getResendApiToken(from));
+		const emailData = {
+			from: from,
+			to: email.to.toString(),
+			bcc: 'benjamin.agullana@gmail.com',
+			subject: email.subject
 		};
-	}
 
-	/**
-	 * Converts an IContact or IContact[] to a Contact[]
-	 * @param contacts
-	 * @protected
-	 */
-	protected static convertContacts(contacts: IContact | IContact[]): IMCContact[] {
-		if (!contacts) {
-			return [];
+		if (email.html) {
+			emailData.html = email.html?.toString();
 		}
 
-		const contactArray: IContact[] = Array.isArray(contacts) ? contacts : [contacts];
-		const convertedContacts: IMCContact[] = contactArray.map(Email.convertContact);
-
-		return convertedContacts;
-	}
-
-	/**
-	 * Converts an IContact to a Contact
-	 * @param contact
-	 * @protected
-	 */
-	protected static convertContact(contact: IContact): IMCContact {
-		if (typeof contact === 'string') {
-			return { email: contact, name: undefined };
+		if (email.text) {
+			emailData.text = email.text?.toString();
 		}
 
-		return { email: contact.email, name: contact.name };
+		const { data, error } = await resend.emails.send(emailData);
+
+		console.log(data, error);
+
+		return Response.json({ data, error });
+
 	}
+
 }
 
 export default Email;
